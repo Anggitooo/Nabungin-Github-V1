@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | Nabungin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background-color: #ffffff;
+      padding: 50px 35px;
+      border-radius: 20px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .emoji {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #c2185b;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #f48fb1;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #d81b60;
+      box-shadow: 0 0 0 2px #f8bbd052;
+    }
+
+    button {
+      background-color: #d81b60;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background-color: #ad1457;
+    }
+
+    a {
+      display: block;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ab47bc;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    /* Popup Daftar */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 16px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .popup-content h3 {
+      color: #c2185b;
+      margin-bottom: 20px;
+    }
+
+    .popup-content button {
+      margin-top: 10px;
+    }
+
+    .popup-content .close-btn {
+      background: #ccc;
+      color: black;
+    }
+
+    .popup-content .close-btn:hover {
+      background: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <div class="emoji">🔐</div>
+    <h2>Masuk ke Nabungin</h2>
+    <input type="text" id="username" placeholder="👤 Nama Pengguna" />
+    <input type="password" id="password" placeholder="🔒 Kata Sandi" />
+    <button onclick="login()">Login</button>
+    <a onclick="document.getElementById('popup').style.display='flex'">📌 Belum punya akun? Daftar Sekarang</a>
+    <div id="errorMessage" class="error"></div>
+  </div>
+
+  <!-- Pop-up Registrasi -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <h3>Daftar Akun Baru</h3>
+      <input type="text" id="newUsername" placeholder="👤 Nama Pengguna" />
+      <input type="password" id="newPassword" placeholder="🔒 Kata Sandi" />
+      <button onclick="register()">✅ Daftar</button>
+      <button class="close-btn" onclick="document.getElementById('popup').style.display='none'">❌ Tutup</button>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorDiv = document.getElementById("errorMessage");
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("activeUser", username);
+        window.location.href = "index.html";
+      } else {
+        errorDiv.textContent = "❗ Nama pengguna atau kata sandi salah.";
+      }
+    }
+
+    function register() {
+      const newUsername = document.getElementById('newUsername').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+
+      if (!newUsername || !newPassword) {
+        alert("⚠️ Harap isi semua kolom!");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const exists = users.some(u => u.username === newUsername);
+
+      if (exists) {
+        alert("⚠️ Username sudah terdaftar!");
+      } else {
+        users.push({ username: newUsername, password: newPassword });
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("🎉 Akun berhasil dibuat! Silakan login.");
+        document.getElementById('popup').style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>

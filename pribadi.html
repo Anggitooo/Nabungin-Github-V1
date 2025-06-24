@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabungan Pribadi | Nabungin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #fdeff5, #f8bbd0);
+      margin: 0;
+      padding: 20px;
+      color: #6a1b9a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .emoji {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-family: 'Times New Roman', serif;
+      font-size: 34px;
+      color: #d81b60;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 45%;
+      padding: 12px;
+      margin: 10px 5px;
+      border-radius: 10px;
+      border: 1px solid #f48fb1;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      background-color: #ec407a;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border-radius: 10px;
+      margin: 10px 5px 25px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #d81b60;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: #fff0f5;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 14px;
+      border: 1px solid #f8bbd0;
+      text-align: center;
+    }
+
+    th {
+      background-color: #fce4ec;
+      color: #ad1457;
+    }
+
+    #saldoAkhir {
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #880e4f;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 30px;
+      background-color: #ba68c8;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    a:hover {
+      background-color: #8e24aa;
+    }
+
+    @media (max-width: 600px) {
+      input {
+        width: 100%;
+        margin: 8px 0;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="emoji">👛</div>
+    <h2>Tabungan Pribadi</h2>
+
+    <input type="text" id="nama" placeholder="🧍Nama Anda" />
+    <input type="date" id="tanggal" />
+    <input type="number" id="tabungan" placeholder="💰Jumlah Tabungan" />
+    <input type="number" id="pengeluaran" placeholder="🛒Jumlah Pengeluaran" />
+    <br/>
+    <button onclick="tambahData()">➕ Tambah</button>
+    <button onclick="resetData()">🔄 Reset</button>
+
+    <table id="tabelRiwayat">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Nama</th>
+          <th>Tabungan</th>
+          <th>Pengeluaran</th>
+          <th>Saldo</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="saldoAkhir">Saldo Akhir: Rp0</div>
+
+    <a href="index.html">⬅️ Kembali ke Dashboard</a>
+  </div>
+
+  <script>
+    let totalSaldo = 0;
+    let dataTabungan = [];
+
+    window.onload = function () {
+      const stored = localStorage.getItem("tabunganPribadi");
+      if (stored) {
+        dataTabungan = JSON.parse(stored);
+        dataTabungan.forEach(data => tampilkanData(data));
+      }
+    };
+
+    function tambahData() {
+      const nama = document.getElementById("nama").value.trim();
+      const tanggal = document.getElementById("tanggal").value;
+      const tabung = parseFloat(document.getElementById("tabungan").value);
+      const keluar = parseFloat(document.getElementById("pengeluaran").value);
+      const saldo = tabung - keluar;
+
+      if (!nama || !tanggal || isNaN(tabung) || isNaN(keluar)) {
+        alert("Mohon isi semua data dengan benar!");
+        return;
+      }
+
+      const data = { tanggal, nama, tabung, keluar, saldo };
+      dataTabungan.push(data);
+      localStorage.setItem("tabunganPribadi", JSON.stringify(dataTabungan));
+      tampilkanData(data);
+      resetInput();
+    }
+
+    function tampilkanData(item) {
+      const tabel = document.getElementById("tabelRiwayat").getElementsByTagName('tbody')[0];
+      const row = tabel.insertRow();
+      row.innerHTML = `
+        <td>${item.tanggal}</td>
+        <td>${item.nama}</td>
+        <td>Rp${item.tabung.toLocaleString()}</td>
+        <td>Rp${item.keluar.toLocaleString()}</td>
+        <td>Rp${item.saldo.toLocaleString()}</td>
+      `;
+      totalSaldo += item.saldo;
+      document.getElementById("saldoAkhir").innerText = `Saldo Akhir: Rp${totalSaldo.toLocaleString()}`;
+    }
+
+    function resetInput() {
+      document.getElementById("nama").value = "";
+      document.getElementById("tanggal").value = "";
+      document.getElementById("tabungan").value = "";
+      document.getElementById("pengeluaran").value = "";
+    }
+
+    function resetData() {
+      if (confirm("Apakah Anda yakin ingin menghapus semua data?")) {
+        localStorage.removeItem("tabunganPribadi");
+        document.getElementById("tabelRiwayat").getElementsByTagName('tbody')[0].innerHTML = "";
+        dataTabungan = [];
+        totalSaldo = 0;
+        document.getElementById("saldoAkhir").innerText = "Saldo Akhir: Rp0";
+      }
+    }
+  </script>
+</body>
+</html>
